@@ -18,6 +18,15 @@ MAX_IMAGES_BEFORE_PROMPT = 20
 TRANSCRIPT_DIR = Path("BTS/transcripts")
 AUDIO_DIR = Path("BTS/audio")
 ZIP_FOLDER = Path("BTS")
+SYSTEM_PROMPT = ("Respond only in English only.")
+MESSAGE_PROMPT = ("""You are to transcribe a scanned page from a book to make it available to a blind person as an audiobook. 
+Your task is to provide a detailed transcription of the page without altering the actual text content your answer will be read directly without modification so do not write syntax or descriptions that are not in the book things like instead of 'Body text: I am lingren.....' Start reading the text verbatim 'I am lingren....'
+Please include the following:
+Text content: Transcribe all text on the page exactly as it appears, without editing or rewriting or adding testimonials.
+Descriptions of visual elements: This is the only exception where you can create your own text you should create detailed descriptions of any visual elements on the page, such as graphs, images or charts. Describe what they represent, how they are designed, and any relevant information that may be important to someone who cannot see them.
+YOU SHOULD ONLY DESCRIBE THINGS THAT ARE NECESSARY LIKE GRAPHS OR IMAGES. DO NOT DESCRIBE THINGS LIKE PAGE NUMBERS, LAYOUT OF THE PAGE ETC.
+Make sure the transcript is comprehensive and provides all the necessary context to convey the content as accurately and accessibly as possible.
+                            """)
 
 # ElevenLabs API Constants
 VOICE_ID = "G17SuINrv2H9FC6nvetn"  # Christopher
@@ -90,7 +99,7 @@ def transcribe_images(api_key, image_paths):
         message = client.messages.create(
             model="claude-3-5-sonnet-20240620",
             max_tokens=2000,
-            system="Respond only in English only.",
+            system= SYSTEM_PROMPT,
             temperature=0,
             messages=[
                 {
@@ -105,15 +114,7 @@ def transcribe_images(api_key, image_paths):
                         },
                         {
                             "type": "text",
-                            "text": """
-                            You are to transcribe a scanned page from a book to make it available to a blind person as an audiobook. 
-                            Your task is to provide a detailed transcription of the page without altering the actual text content your answer will be read directly without modification so do not write syntax or descriptions that are not in the book things like instead of 'Body text: I am lingren.....' Start reading the text verbatim 'I am lingren....'
-                            Please include the following:
-                            Text content: Transcribe all text on the page exactly as it appears, without editing or rewriting or adding testimonials.
-                            Descriptions of visual elements: This is the only exception where you can create your own text you should create detailed descriptions of any visual elements on the page, such as graphs, images or charts. Describe what they represent, how they are designed, and any relevant information that may be important to someone who cannot see them.
-                            YOU SHOULD ONLY DESCRIBE THINGS THAT ARE NECESSARY LIKE GRAPHS OR IMAGES. DO NOT DESCRIBE THINGS LIKE PAGE NUMBERS, LAYOUT OF THE PAGE ETC.
-                            Make sure the transcript is comprehensive and provides all the necessary context to convey the content as accurately and accessibly as possible.
-                            """
+                            "text": MESSAGE_PROMPT
                         }
                     ],
                 }
